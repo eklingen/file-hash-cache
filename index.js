@@ -1,7 +1,12 @@
 import { webcrypto } from 'node:crypto'
 import { readFile, writeFile } from 'node:fs/promises'
 import { relative, resolve } from 'node:path'
-import { pathExists } from './fs.js'
+
+// Check if path exists
+export const pathExists = async path =>
+  await access(path)
+    .then(() => true)
+    .catch(() => false)
 
 // Sort keys by alphabetical order
 const sortKeys = obj =>

@@ -1,5 +1,5 @@
 import { webcrypto } from 'node:crypto'
-import { readFile, writeFile } from 'node:fs/promises'
+import { access, readFile, writeFile } from 'node:fs/promises'
 import { relative, resolve } from 'node:path'
 
 // Check if path exists

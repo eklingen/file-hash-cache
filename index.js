@@ -36,7 +36,7 @@ export default class FileHashCache {
   }
 
   // Load the cache from disk
-  async load(key = null) {
+  async load(key = null, prune = true) {
     if (!this.hashCache.length && (await pathExists(this.cachePath))) {
       const contents = await readFile(this.cachePath, { encoding: 'utf8' })
 
@@ -53,13 +53,19 @@ export default class FileHashCache {
       this.hashCache[key] = {}
     }
 
-    await this.#pruneEntries()
+    if (prune) {
+      await this.#pruneEntries()
+    }
+
     this.#sortEntries()
   }
 
   // Save the cache to disk
-  async save() {
-    await this.#pruneEntries()
+  async save(prune = false) {
+    if (prune) {
+      await this.#pruneEntries()
+    }
+
     this.#sortEntries()
     await writeFile(this.cachePath, JSON.stringify(this.hashCache, null, 2) + '\n', { encoding: 'utf8' })
   }

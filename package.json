@@ -1,6 +1,6 @@
 {
   "name": "@eklingen/file-hash-cache",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Simple SHA-1 hash cache for tracking file changes.",
   "repository": {
     "type": "git",

@@ -3,10 +3,14 @@ import { access, readFile, writeFile } from 'node:fs/promises'
 import { relative, resolve } from 'node:path'
 
 // Check if path exists
-export const pathExists = async path =>
-  await access(path)
-    .then(() => true)
-    .catch(() => false)
+export const pathExists = async (path = '') => {
+  try {
+    await access(path)
+    return true
+  } catch {
+    return false
+  }
+}
 
 // Sort keys by alphabetical order
 const sortKeys = obj =>

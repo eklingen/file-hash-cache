@@ -97,8 +97,13 @@ export default class FileHashCache {
     const fileKey = relative(this.projectRoot, filepath)
     const fileHash = await this.#getFileHash(filepath, encoding)
     const cachedHash = this.hashCache[key][fileKey] || ''
+    const fileHasChanged = (fileHash !== cachedHash)
 
-    return fileHash !== cachedHash
+    if (fileHasChanged) {
+      this.hashCache[key][fileKey] = fileHash
+    }
+
+    return fileHasChanged
   }
 
   // Compare two files by their SHA-1 hash
@@ -111,8 +116,9 @@ export default class FileHashCache {
     const secondFileContents = await readFile(secondFilepath, { encoding })
     const firstFileHash = await this.#getContentHash(firstFileContents || '', encoding)
     const secondFileHash = await this.#getContentHash(secondFileContents || '', encoding)
+    const filesAreIdentical = firstFileHash === secondFileHash
 
-    return firstFileHash === secondFileHash
+    return filesAreIdentical
   }
 
   // Prune stale entries from the cache
@@ -160,6 +166,8 @@ export default class FileHashCache {
       return ''
     }
 
-    return await this.#getContentHash(fileContents, encoding)
+    const contentHash = await this.#getContentHash(fileContents, encoding)
+
+    return contentHash
   }
 }

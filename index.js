@@ -166,9 +166,7 @@ export default class FileHashCache {
       return ''
     }
 
-    const t = new Date()
     const contentHash = await this.#getContentHash(fileContents, encoding)
-    console.log(new Date() - t, filepath)
 
     return contentHash
   }

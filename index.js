@@ -147,7 +147,7 @@ export default class FileHashCache {
       return ''
     }
 
-    const data = this.encoder.encode(contents.toString(encoding))
+    const data = encoding ? this.encoder.encode(contents.toString(encoding)) : contents
     const arrayBuffer = await webcrypto.subtle.digest('SHA-1', data)
     const hash = Buffer.from(arrayBuffer).toString('base64')
 
@@ -166,7 +166,9 @@ export default class FileHashCache {
       return ''
     }
 
+    const t = new Date()
     const contentHash = await this.#getContentHash(fileContents, encoding)
+    console.log(new Date() - t, filepath)
 
     return contentHash
   }

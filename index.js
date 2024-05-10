@@ -36,7 +36,7 @@ export default class FileHashCache {
   }
 
   // Load the cache from disk
-  async load(key = null, prune = true) {
+  async load(key = null, prune = false) {
     if (!this.hashCache.length && (await pathExists(this.cachePath))) {
       const contents = await readFile(this.cachePath, { encoding: 'utf8' })
 
@@ -46,15 +46,15 @@ export default class FileHashCache {
       } catch {
         this.hashCache = {}
       }
+
+      if (prune) {
+        await this.pruneEntries()
+      }
     }
 
     // Create an empty entry for the key, if it doesn't exist
     if (key && !this.hashCache[key]) {
       this.hashCache[key] = {}
-    }
-
-    if (prune) {
-      await this.#pruneEntries()
     }
 
     this.#sortEntries()
@@ -63,7 +63,7 @@ export default class FileHashCache {
   // Save the cache to disk
   async save(prune = false) {
     if (prune) {
-      await this.#pruneEntries()
+      await this.pruneEntries()
     }
 
     this.#sortEntries()
@@ -122,7 +122,7 @@ export default class FileHashCache {
   }
 
   // Prune stale entries from the cache
-  async #pruneEntries() {
+  async pruneEntries() {
     for (const key of Object.keys(this.hashCache)) {
       for (const fileKey of Object.keys(this.hashCache[key])) {
         if (!(await pathExists(resolve(this.projectRoot, fileKey)))) {

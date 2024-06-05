@@ -170,4 +170,13 @@ export default class FileHashCache {
 
     return contentHash
   }
+
+  // Remove entries from the cache by key
+  async removeEntriesByKeys(...keys) {
+    for (const key of Object.keys(this.hashCache)) {
+      if (keys.includes(key)) {
+        delete this.hashCache[key]
+      }
+    }
+  }
 }

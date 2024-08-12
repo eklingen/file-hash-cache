@@ -22,7 +22,7 @@ const sortKeys = obj =>
     }, {})
 
 export default class FileHashCache {
-  constructor(defaultKey = 'file', cacheFile = '.hash-cache.json', cacheRoot = process.cwd(), projectRoot = process.cwd()) {
+  constructor(defaultKey = 'file', cacheFile = '.hash-cache.json', cacheRoot = process.cwd(), projectRoot = process.cwd(), enableBypass = false) {
     this.defaultKey = defaultKey
     this.defaultEncoding = 'utf-8'
 
@@ -30,6 +30,7 @@ export default class FileHashCache {
     this.cacheRoot = cacheRoot
     this.cacheFile = cacheFile
     this.cachePath = resolve(this.cacheRoot, this.cacheFile)
+    this.enabled = !enableBypass
 
     this.encoder = new TextEncoder()
     this.hashCache = {}
@@ -37,6 +38,10 @@ export default class FileHashCache {
 
   // Load the cache from disk
   async load(key = null, prune = false) {
+    if (!this.enabled) {
+      return
+    }
+
     if (!this.hashCache.length && (await pathExists(this.cachePath))) {
       const contents = await readFile(this.cachePath, { encoding: 'utf8' })
 
@@ -62,6 +67,10 @@ export default class FileHashCache {
 
   // Save the cache to disk
   async save(prune = false) {
+    if (!this.enabled) {
+      return
+    }
+
     if (prune) {
       await this.pruneEntries()
     }
@@ -72,6 +81,10 @@ export default class FileHashCache {
 
   // Get the SHA-1 hash of a file and update the cache
   async updateEntry(filepath = '', key = this.defaultKey, encoding = this.defaultEncoding) {
+    if (!this.enabled) {
+      return true
+    }
+
     if (!filepath || !(await pathExists(filepath))) {
       return false
     }
@@ -90,6 +103,10 @@ export default class FileHashCache {
 
   // Check if a file has changed since the last SHA-1 hash was calculated
   async fileHasChanged(filepath = '', key = this.defaultKey, encoding = this.defaultEncoding) {
+    if (!this.enabled) {
+      return true
+    }
+
     if (!this.hashCache[key]) {
       await this.load(key)
     }
@@ -108,6 +125,10 @@ export default class FileHashCache {
 
   // Compare two files by their SHA-1 hash
   async compareFiles(firstFilepath = '', secondFilepath = '', encoding = this.defaultEncoding) {
+    if (!this.enabled) {
+      return false
+    }
+
     if (!firstFilepath || !secondFilepath || !(await pathExists(firstFilepath)) || !(await pathExists(secondFilepath))) {
       return false
     }
@@ -123,6 +144,10 @@ export default class FileHashCache {
 
   // Prune stale entries from the cache
   async pruneEntries() {
+    if (!this.enabled) {
+      return
+    }
+
     for (const key of Object.keys(this.hashCache)) {
       for (const fileKey of Object.keys(this.hashCache[key])) {
         if (!(await pathExists(resolve(this.projectRoot, fileKey)))) {
@@ -134,6 +159,10 @@ export default class FileHashCache {
 
   // Sort cache entries alphabetically
   #sortEntries() {
+    if (!this.enabled) {
+      return
+    }
+
     for (const key of Object.keys(this.hashCache)) {
       this.hashCache[key] = sortKeys(this.hashCache[key])
     }
@@ -143,6 +172,10 @@ export default class FileHashCache {
 
   // Get the SHA-1 hash of a string
   async #getContentHash(contents = '', encoding = this.defaultEncoding) {
+    if (!this.enabled) {
+      return ''
+    }
+
     if (!contents || !contents.length) {
       return ''
     }
@@ -156,6 +189,10 @@ export default class FileHashCache {
 
   // Get the SHA-1 hash of a file
   async #getFileHash(filepath = '', encoding = this.defaultEncoding) {
+    if (!this.enabled) {
+      return ''
+    }
+
     if (!filepath || !(await pathExists(filepath))) {
       return ''
     }
@@ -173,6 +210,10 @@ export default class FileHashCache {
 
   // Remove entries from the cache by key
   async removeEntriesByKeys(...keys) {
+    if (!this.enabled) {
+      return
+    }
+
     for (const key of Object.keys(this.hashCache)) {
       if (keys.includes(key)) {
         delete this.hashCache[key]

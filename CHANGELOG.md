@@ -1,6 +1,7 @@
 
 # Changelog
 
+v1.1.1 - Added `enableBypass` option to the constructor, to enable quick disabling of the whole caching mechanism.
 v1.1.0 - Addd `removeEntriesByKeys(...key)` function.
 v1.0.7 - The `prune` option in `load()` is now false by default, like in `save()`, and `pruneEntries()` is now public.
 v1.0.6 - Bugfix: Removed `console.log` statement.

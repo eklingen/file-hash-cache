@@ -1,6 +1,6 @@
 import { webcrypto } from 'node:crypto'
 import { access, readFile, writeFile } from 'node:fs/promises'
-import { relative, resolve } from 'node:path'
+import { relative as relativePath, resolve as resolvePath } from 'node:path'
 
 // Check if path exists
 export const pathExists = async (path = '') => {
@@ -29,7 +29,7 @@ export default class FileHashCache {
     this.projectRoot = projectRoot
     this.cacheRoot = cacheRoot
     this.cacheFile = cacheFile
-    this.cachePath = resolve(this.cacheRoot, this.cacheFile)
+    this.cachePath = resolvePath(process.cwd(), this.cacheRoot, this.cacheFile)
     this.enabled = !enableBypass
 
     this.encoder = new TextEncoder()
@@ -89,7 +89,7 @@ export default class FileHashCache {
       return false
     }
 
-    const fileKey = relative(this.projectRoot, filepath)
+    const fileKey = relativePath(this.projectRoot, filepath)
     const fileHash = await this.#getFileHash(filepath, encoding)
 
     if (!this.hashCache[key]) {
@@ -111,7 +111,7 @@ export default class FileHashCache {
       await this.load(key)
     }
 
-    const fileKey = relative(this.projectRoot, filepath)
+    const fileKey = relativePath(this.projectRoot, filepath)
     const fileHash = await this.#getFileHash(filepath, encoding)
     const cachedHash = this.hashCache[key][fileKey] || ''
     const fileHasChanged = (fileHash !== cachedHash)
@@ -150,7 +150,7 @@ export default class FileHashCache {
 
     for (const key of Object.keys(this.hashCache)) {
       for (const fileKey of Object.keys(this.hashCache[key])) {
-        if (!(await pathExists(resolve(this.projectRoot, fileKey)))) {
+        if (!(await pathExists(resolvePath(process.cwd(), this.projectRoot, fileKey)))) {
           delete this.hashCache[key][fileKey]
         }
       }

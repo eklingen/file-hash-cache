@@ -107,12 +107,13 @@ export default class FileHashCache {
       return true
     }
 
+    const fileKey = relativePath(this.projectRoot, filepath)
+    const fileHash = await this.#getFileHash(filepath, encoding)
+
     if (!this.hashCache[key]) {
       await this.load(key)
     }
 
-    const fileKey = relativePath(this.projectRoot, filepath)
-    const fileHash = await this.#getFileHash(filepath, encoding)
     const cachedHash = this.hashCache[key][fileKey] || ''
     const fileHasChanged = (fileHash !== cachedHash)
 

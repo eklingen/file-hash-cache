@@ -1,6 +1,7 @@
 
 # Changelog
 
+v1.1.4 - Added a `.clear()` method to empty the cache.
 v1.1.3 - Fixed possible race condition in `fileHasChanged` function.
 v1.1.2 - Some small changes for Windows compatibility
 v1.1.1 - Added `enableBypass` option to the constructor, to enable quick disabling of the whole caching mechanism.

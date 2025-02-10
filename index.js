@@ -79,6 +79,19 @@ export default class FileHashCache {
     await writeFile(this.cachePath, JSON.stringify(this.hashCache, null, 2) + '\n', { encoding: 'utf8' })
   }
 
+  // Clear the cache
+  async clear(save = false) {
+    if (!this.enabled) {
+      return
+    }
+
+    this.hashCache = {}
+
+    if (save) {
+      await this.save(false)
+    }
+  }
+
   // Get the SHA-1 hash of a file and update the cache
   async updateEntry(filepath = '', key = this.defaultKey, encoding = this.defaultEncoding) {
     if (!this.enabled) {
